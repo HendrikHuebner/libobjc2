@@ -46,7 +46,7 @@ PRIVATE void call_cxx_destruct(id obj)
 		cls = cls->super_class;
 		if (currentClass->cxx_destruct)
 		{
-			currentClass->cxx_destruct(obj, cxx_destruct);
+			((void (*)(id, SEL))currentClass->cxx_destruct)(obj, cxx_destruct);
 		}
 	}
 }
@@ -65,7 +65,7 @@ static void call_cxx_construct_for_class(Class cls, id obj)
 	}
 	if (cls->cxx_construct)
 	{
-		cls->cxx_construct(obj, cxx_construct);
+		((id (*)(id, SEL))cls->cxx_construct)(obj, cxx_construct);
 	}
 }
 
@@ -846,4 +846,3 @@ void objc_registerClassPair(Class cls)
 	class_table_insert(cls);
 	objc_resolve_class(cls);
 }
-

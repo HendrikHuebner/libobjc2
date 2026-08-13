@@ -851,6 +851,12 @@ OBJC_PUBLIC void objc_send_initialize(id object)
 	// Store the buffer in the temporary dtables list.  Note that it is safe to
 	// insert it into a global list, even though it's a temporary variable,
 	// because we will clean it up after this function.
+	/* +initialize has a fixed void(id, SEL) signature.  Calling it through
+	 * generic IMP is tolerated by native ABIs, but traps on WebAssembly's
+	 * exactly typed call_indirect. */
+#ifdef __wasm__
+	((void (*)(id, SEL))initializeSlot->imp)((id)class, initializeSel);
+#else
 	initializeSlot->imp((id)class, initializeSel);
+#endif
 }
-

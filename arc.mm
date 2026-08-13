@@ -603,7 +603,8 @@ static inline id autorelease(id obj)
 		initAutorelease();
 		if (0 != AutoreleaseAdd)
 		{
-			AutoreleaseAdd(AutoreleasePool, SELECTOR(addObject:), obj);
+			reinterpret_cast<void (*)(id, SEL, id)>(AutoreleaseAdd)(
+				AutoreleasePool, SELECTOR(addObject:), obj);
 		}
 		return obj;
 	}
@@ -676,7 +677,8 @@ extern "C" OBJC_PUBLIC void *objc_autoreleasePoolPush(void)
 	}
 	initAutorelease();
 	if (0 == NewAutoreleasePool) { return NULL; }
-	return NewAutoreleasePool(AutoreleasePool, SELECTOR(new));
+	return reinterpret_cast<id (*)(id, SEL)>(NewAutoreleasePool)(
+		AutoreleasePool, SELECTOR(new));
 }
 extern "C" OBJC_PUBLIC void objc_autoreleasePoolPop(void *pool)
 {
@@ -692,7 +694,8 @@ extern "C" OBJC_PUBLIC void objc_autoreleasePoolPop(void *pool)
 			return;
 		}
 	}
-	DeleteAutoreleasePool(static_cast<id>(pool), SELECTOR(release));
+	reinterpret_cast<void (*)(id, SEL)>(DeleteAutoreleasePool)(
+		static_cast<id>(pool), SELECTOR(release));
 	struct arc_tls* tls = getARCThreadData();
 	if (tls && tls->returnRetained)
 	{
@@ -786,13 +789,12 @@ extern "C" OBJC_PUBLIC void objc_release(id obj)
 	release(obj);
 }
 
-extern "C" OBJC_PUBLIC id objc_storeStrong(id *addr, id value)
+extern "C" OBJC_PUBLIC void objc_storeStrong(id *addr, id value)
 {
 	value = objc_retain(value);
 	id oldValue = *addr;
 	*addr = value;
 	objc_release(oldValue);
-	return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

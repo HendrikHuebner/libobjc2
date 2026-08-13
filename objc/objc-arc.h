@@ -67,7 +67,7 @@ OBJC_PUBLIC id objc_retainBlock(id b);
  * Stores value in addr.  This first retains value, then releases the old value
  * at addr, and stores the retained value in the address.
  */
-OBJC_PUBLIC id objc_storeStrong(id *addr, id value);
+OBJC_PUBLIC void objc_storeStrong(id *addr, id value);
 /**
  * Stores obj in zeroing weak pointer addr.  If obj has begun deallocation,
  * then this stores nil.
@@ -150,4 +150,3 @@ OBJC_PUBLIC unsigned long objc_arc_autorelease_count_for_object_np(id);
 #endif
 
 #endif // __OBJC_ARC_INCLUDED__
-
